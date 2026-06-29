@@ -1,77 +1,163 @@
-# PropSight — Real Estate Valuation Platform
+<div align="center">
 
-## What changed from your original version
-| Bug | File | Fix |
-|---|---|---|
-| Default form inputs predicted **$184M** | `app.py` | Non-user features now default to dataset **medians**, not zero |
-| Neighborhood selector had **zero effect** on price | `train_model.py` | One-hot Neighborhood columns are now actually trained on and saved |
-| Headline R²/MAE was computed on **training data** (optimistic) | `train_model.py` | Reports honest **held-out test** R²/MAE (93.68% / $12,695) |
-| "Key Drivers" chart was **hardcoded fake numbers** | `app.py` | Pulled live from `gbr_model.feature_importances_` |
+<img src="https://img.shields.io/badge/PropSight-Real%20Estate%20AI-4f46e5?style=for-the-badge&logo=house&logoColor=white" alt="PropSight"/>
 
-Full model artifacts were retrained with `train_model.py` and saved to `models/`.
+# 🏡 PropSight — Real Estate Valuation Platform
 
-## Project structure
+**Predict residential property values with machine learning, powered by Streamlit.**
+
+[![Live App](https://img.shields.io/badge/🚀%20Live%20App-propsight.streamlit.app-ff4b4b?style=for-the-badge)](https://propsight.streamlit.app)
+[![Python](https://img.shields.io/badge/Python-3.10+-3776ab?style=flat-square&logo=python&logoColor=white)](https://python.org)
+[![Streamlit](https://img.shields.io/badge/Streamlit-1.35+-ff4b4b?style=flat-square&logo=streamlit&logoColor=white)](https://streamlit.io)
+[![scikit-learn](https://img.shields.io/badge/scikit--learn-1.8.0-f7931e?style=flat-square&logo=scikitlearn&logoColor=white)](https://scikit-learn.org)
+[![License: MIT](https://img.shields.io/badge/License-MIT-22c55e?style=flat-square)](LICENSE)
+
+</div>
+
+---
+
+## ✨ What is PropSight?
+
+PropSight is an interactive real estate valuation web app that uses ensemble machine learning models to estimate house prices based on property features. Simply enter a home's specs — size, quality, neighborhood, year built — and PropSight returns an instant price prediction backed by three trained models: **Ridge Regression**, **Lasso Regression**, and a **Gradient Boosting Regressor**.
+
+> 📊 **Held-out test accuracy: R² = 93.68% · MAE = $12,695**
+
+---
+
+## 🎯 Features
+
+- 🔮 **Instant price prediction** — enter property details and get a valuation in real time
+- 🤖 **Three ML models** — Ridge, Lasso, and Gradient Boosting with live comparison
+- 📈 **Key price drivers** — feature importance chart pulled live from the trained GBR model
+- 🏘️ **Neighborhood-aware** — one-hot encoded neighborhood effects trained into the model
+- 📄 **Technical documentation** — downloadable PDF with full methodology
+- 🎛️ **Sensible defaults** — non-user features default to dataset medians (no phantom $184M predictions)
+
+---
+
+## 🖥️ Try It Live
+
+**No installation needed** — the app is deployed and ready at:
+
+> **[https://propsight.streamlit.app](https://propsight.streamlit.app)**
+
+
+DataSet Available at Kaggle:
+
+> **[Kaggle](https://www.kaggle.com/competitions/house-prices-advanced-regression-techniques/submissions#)**
+
+---
+
+## 🗂️ Project Structure
+
 ```
-propsight/
-├── app.py                  # Streamlit app (entry point)
-├── train_model.py          # Retraining script — run this if you update train.csv
-├── requirements.txt
+propsight-analysis/
+├── app.py                      # 🚀 Streamlit app (entry point)
+├── requirements.txt            # 📦 Python dependencies
+├── notebook.ipynb              # 📓 Exploratory data analysis
+├── Technical_Documentation.pdf # 📄 Full methodology writeup
+│
 ├── data/
-│   └── train.csv
-├── models/
-│   ├── ridge_model.pkl
-│   ├── lasso_model.pkl
-│   ├── gbr_model.pkl
-│   ├── model_columns.pkl
-│   ├── feature_medians.pkl
-│   ├── feature_importances.pkl
-│   └── metrics.pkl
-└── Technical_Documentation.pdf   # optional, shown as a download button
+│   └── train.csv               # 🏠 Ames Housing dataset
+│
+└── models/
+    ├── ridge_model.pkl         # Ridge regression
+    ├── lasso_model.pkl         # Lasso regression
+    ├── gbr_model.pkl           # Gradient Boosting (primary)
+    ├── model_columns.pkl       # Feature schema
+    ├── feature_medians.pkl     # Median defaults for non-user inputs
+    ├── feature_importances.pkl # Live driver chart data
+    └── metrics.pkl             # Honest held-out test metrics
 ```
 
-## Deploying to Streamlit Community Cloud
+---
 
-1. **Create a GitHub repo** and push everything in this folder to it (including
-   `data/train.csv` and the `models/*.pkl` files — they're small enough to
-   commit directly, no Git LFS needed).
-   ```bash
-   git init
-   git add .
-   git commit -m "PropSight valuation app"
-   git branch -M main
-   git remote add origin https://github.com/<your-username>/<your-repo>.git
-   git push -u origin main
-   ```
-   Do **not** commit anything in `.ipynb_checkpoints/` — the `.gitignore` here
-   already excludes it.
+## ⚡ Local Setup
 
-2. Go to **[share.streamlit.io](https://share.streamlit.io)** and sign in with
-   your GitHub account.
+```bash
+# 1. Clone the repo
+git clone https://github.com/Butkii025/propsight-analysis.git
+cd propsight-analysis
 
-3. Click **"New app"**, then:
-   - **Repository**: pick the repo you just pushed
-   - **Branch**: `main`
-   - **Main file path**: `app.py`
+# 2. Install dependencies
+pip install -r requirements.txt
 
-4. Click **Deploy**. Streamlit Cloud installs everything in `requirements.txt`
-   automatically — first deploy usually takes 2–4 minutes.
+# 3. Run the app
+streamlit run app.py
+```
 
-5. You'll get a public URL like `https://<your-app-name>.streamlit.app` that
-   anyone can open — that's the live frontend for end users.
+The app will open at `http://localhost:8501`.
 
-## Updating the model later
-If you retrain (e.g. with new data), just run:
+---
+
+## 🧠 Models & Performance
+
+| Model | Description | Role |
+|---|---|---|
+| **Gradient Boosting** | 500 trees, max depth 4 | Primary predictor |
+| **Ridge Regression** | L2-regularised linear | Comparison baseline |
+| **Lasso Regression** | L1-regularised linear | Comparison baseline |
+
+All models are trained on the **Ames Housing dataset** and evaluated on a held-out test split.
+
+```
+Test R²  →  93.68%
+Test MAE →  $12,695
+```
+
+---
+
+## 🔧 Retraining the Model
+
+If you update `data/train.csv`, regenerate all model artifacts with:
+
 ```bash
 python train_model.py
 ```
-then `git add models/ && git commit -m "retrain" && git push` — Streamlit
-Cloud auto-redeploys on every push to the connected branch.
 
-## Notes
-- `test.csv` and `sample_submission.csv` from the original Kaggle workflow
-  aren't needed by the app — leave them out of the repo to keep it lean.
-- Neighborhood effects in the UI are intentionally modest (~5–10% swings, not
-  the raw 3x gap you'd see in `train.csv` between e.g. MeadowV and NoRidge).
-  That's correct: most of the raw neighborhood price gap is already explained
-  by quality/size, which strongly correlate with neighborhood — the model is
-  showing the residual location premium *after* controlling for those.
+Then push the updated `models/` folder — Streamlit Cloud auto-redeploys on every push.
+
+```bash
+git add models/
+git commit -m "retrain: updated model artifacts"
+git push
+```
+
+---
+
+## 🐛 Bugs Fixed vs. Original
+
+| Bug | File | Fix |
+|---|---|---|
+| Default inputs predicted **$184M** | `app.py` | Non-user features now default to dataset **medians** |
+| Neighborhood had **zero effect** on price | `train_model.py` | Neighborhood one-hot columns now trained and saved |
+| R²/MAE computed on **training data** | `train_model.py` | Reports honest **held-out test** metrics |
+| "Key Drivers" chart was **hardcoded** | `app.py` | Pulled live from `gbr_model.feature_importances_` |
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend / UI | Streamlit |
+| ML Models | scikit-learn (Ridge, Lasso, GBR) |
+| Data Wrangling | pandas, numpy |
+| Visualisation | Plotly |
+| Model Serialisation | joblib |
+| Deployment | Streamlit Community Cloud |
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
+
+
+---
+
+<div align="center">
+
+⭐ **Star this repo if you found it useful!** ⭐
+
+</div>
